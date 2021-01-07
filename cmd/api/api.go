@@ -5,17 +5,15 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/error2215/bitmex_ws_api/server/http"
-	"github.com/error2215/bitmex_ws_api/server/ws"
-
-	"github.com/error2215/bitmex_ws_api/models"
-
 	"golang.org/x/net/websocket"
 
 	"github.com/sirupsen/logrus"
 
 	"github.com/error2215/bitmex_ws_api/config"
 	"github.com/error2215/bitmex_ws_api/server"
+	"github.com/error2215/bitmex_ws_api/server/http"
+	"github.com/error2215/bitmex_ws_api/server/ws"
+	"github.com/error2215/bitmex_ws_api/storage"
 )
 
 const bitmexURL = "testnet.bitmex.com"
@@ -85,12 +83,12 @@ func (a *BitmexInstrumentAPI) readInstrumentMessages(ws *websocket.Conn) {
 				if price, ok := symbol.(map[string]interface{})["lastPrice"].(float64); ok {
 					name := symbol.(map[string]interface{})["symbol"].(string)
 
-					symb := models.ReadSymbol(name)
+					symb := storage.ReadSymbol(name)
 					symb.Symbol = name
 					symb.Timestamp = symbol.(map[string]interface{})["timestamp"].(string)
 					symb.Price = price
 
-					models.UpdateSymbol(name, symb, a.Logger)
+					storage.UpdateSymbol(name, symb, a.Logger)
 					a.SendFreshData(name)
 				}
 			}
@@ -99,7 +97,7 @@ func (a *BitmexInstrumentAPI) readInstrumentMessages(ws *websocket.Conn) {
 }
 
 func (a *BitmexInstrumentAPI) SendFreshData(key string) {
-	symbol := models.ReadSymbol(key)
+	symbol := storage.ReadSymbol(key)
 	data, err := json.Marshal(symbol)
 	if err != nil {
 		a.Errorln(err)

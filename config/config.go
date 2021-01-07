@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 var (
@@ -18,15 +20,15 @@ type AppConfig struct {
 func DefaultAppConfig() *AppConfig {
 	return &AppConfig{
 		serverTypes:    []ServerType{WS},
-		WSServerPort:   "111",
-		HTTPServerPort: "222",
+		WSServerPort:   "8080",
+		HTTPServerPort: "8081",
 	}
 }
 
 func ParseAppConfig() (*AppConfig, error) {
-	//if err := godotenv.Load(); err != nil {
-	//	return nil, envFileLoadError
-	//}
+	if err := godotenv.Load(".env"); err != nil {
+		return nil, envFileLoadError
+	}
 
 	appConf := DefaultAppConfig()
 	if os.Getenv("HTTP_SERVER") == "true" {

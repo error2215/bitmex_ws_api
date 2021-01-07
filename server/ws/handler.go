@@ -6,13 +6,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/error2215/bitmex_ws_api/util"
-
+	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 
-	"github.com/gorilla/websocket"
-
 	"github.com/error2215/bitmex_ws_api/models"
+	"github.com/error2215/bitmex_ws_api/storage"
+	"github.com/error2215/bitmex_ws_api/util"
 )
 
 func init() {
@@ -55,10 +54,10 @@ func WSHandler(w http.ResponseWriter, r *http.Request) {
 		case "subscribe":
 			for _, symbol := range msgStr.Symbols {
 				subscribes = append(subscribes, symbol)
-				models.AddSubscribe(subscribeCh, symbol, logger)
+				storage.AddSubscribe(subscribeCh, symbol, logger)
 
 				//send last price
-				msg := models.ReadSymbol(symbol)
+				msg := storage.ReadSymbol(symbol)
 				data, err := json.Marshal(msg)
 				if err != nil {
 					logger.Errorln(err)
@@ -67,7 +66,7 @@ func WSHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		case "unsubscribe":
 			for _, symbol := range subscribes {
-				models.RemoveSubscribe(subscribeCh, symbol, logger)
+				storage.RemoveSubscribe(subscribeCh, symbol, logger)
 			}
 		// unsupported message
 		default:

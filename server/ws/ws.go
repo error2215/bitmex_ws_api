@@ -4,9 +4,7 @@ import (
 	"sync"
 
 	"github.com/gin-gonic/gin"
-
 	"github.com/gorilla/websocket"
-
 	"github.com/sirupsen/logrus"
 )
 
