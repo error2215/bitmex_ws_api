@@ -3,12 +3,18 @@ package ws
 import (
 	"sync"
 
+	"github.com/gin-gonic/gin"
+
+	"github.com/gorilla/websocket"
+
 	"github.com/sirupsen/logrus"
 )
 
+var upgrader = websocket.Upgrader{}
+
 type WSServer struct {
-	port   string
-	logger *logrus.Entry
+	port string
+	*logrus.Logger
 }
 
 func NewWSServer(port string) *WSServer {
@@ -18,5 +24,12 @@ func NewWSServer(port string) *WSServer {
 }
 
 func (serv *WSServer) Start(wg *sync.WaitGroup) {
+	serv.Logger = logrus.StandardLogger()
+	r := gin.Default()
+
+	r.GET("/", gin.WrapF(WSHandler))
+	if err := r.Run(); err != nil {
+		serv.Error(err)
+	}
 	defer wg.Done()
 }

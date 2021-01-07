@@ -3,8 +3,6 @@ package config
 import (
 	"fmt"
 	"os"
-
-	"github.com/joho/godotenv"
 )
 
 var (
@@ -26,9 +24,9 @@ func DefaultAppConfig() *AppConfig {
 }
 
 func ParseAppConfig() (*AppConfig, error) {
-	if err := godotenv.Load(); err != nil {
-		return nil, envFileLoadError
-	}
+	//if err := godotenv.Load(); err != nil {
+	//	return nil, envFileLoadError
+	//}
 
 	appConf := DefaultAppConfig()
 	if os.Getenv("HTTP_SERVER") == "true" {
